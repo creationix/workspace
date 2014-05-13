@@ -29,14 +29,14 @@ if (!pem) {
   // use workers: -1 to run a fast core estimator to optimize # of workers
   rsa.generateKeyPair({bits: 2048, workers: 2}, function(err, keypair) {
     privateKey = keypair.privateKey;
-    document.body.textContent = "Done!";
-    var pass1, pass2;
+    document.body.textContent = "Key Generated!";
+    var password, password2;
     do {
-      while (pass1 = window.prompt("Enter passphrase to secure private key"), !pass1);
-      while (pass2 = window.prompt("Enter same passphrase to verify"), pass2 !== pass2);
-    } while (pass1 !== pass2);
-    password = pass1;
-    if (!password || !privateKey) return;
+      password = getVariable("password", "Enter passphrase to secure private key");
+      if (!password) return;
+      password2 = getVariable("password", "Enter same passphrase to verify");
+      if (!password2) return;
+    } while (password !== password2);
     var pem = pki.encryptRsaPrivateKey(privateKey, password);
     console.log(pem);
     localStorage.setItem("pem", pem);
@@ -45,12 +45,25 @@ if (!pem) {
   return;
 }
 
+function getVariable(variable, message) {
+  var query = window.location.search.substring(1);
+  var vars = query.split('&');
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split('=');
+    if (decodeURIComponent(pair[0]) == variable) {
+      return decodeURIComponent(pair[1]);
+    }
+  }
+  return window.prompt(message || "Please enter " + variable);
+}
+
+
 
 var pem = localStorage.getItem("pem");
-do {
-  var password = window.prompt("Enter passphrase to unlock private key");
-  privateKey = pki.decryptRsaPrivateKey(pem, password);
-} while (!privateKey);
+password = getVariable("password", "Enter passphrase to unlock private key");
+if (!password) return;
+
+privateKey = pki.decryptRsaPrivateKey(pem, password);
 var publicKey = pki.setRsaPublicKey(privateKey.n, privateKey.e);
 
 document.body.textContent = "Private key loaded and decrypted from localStorage!";
