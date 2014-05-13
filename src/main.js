@@ -30,32 +30,21 @@ if (!pem) {
   rsa.generateKeyPair({bits: 2048, workers: 2}, function(err, keypair) {
     privateKey = keypair.privateKey;
     document.body.textContent = "Done!";
-    check();
+    var pass1, pass2;
+    do {
+      while (pass1 = window.prompt("Enter passphrase to secure private key"), !pass1);
+      while (pass2 = window.prompt("Enter same passphrase to verify"), pass2 !== pass2);
+    } while (pass1 !== pass2);
+    password = pass1;
+    if (!password || !privateKey) return;
+    var pem = pki.encryptRsaPrivateKey(privateKey, password);
+    console.log(pem);
+    localStorage.setItem("pem", pem);
+    window.location.reload();
   });
-  setTimeout(promptPassword, 100);
-
-
   return;
 }
 
-function promptPassword() {
-  var pass1, pass2;
-  do {
-    while (pass1 = window.prompt("Enter passphrase to secure private key"), !pass1);
-    while (pass2 = window.prompt("Enter same passphrase to verify"), pass2 !== pass2);
-  } while (pass1 !== pass2);
-  password = pass1;
-
-  check();
-}
-
-function check() {
-  if (!password || !privateKey) return;
-  var pem = pki.encryptRsaPrivateKey(privateKey, password);
-  console.log(pem);
-  localStorage.setItem("pem", pem);
-  window.reload();
-}
 
 var pem = localStorage.getItem("pem");
 do {
