@@ -1,0 +1,5 @@
+{
+  program: "compiler"
+  input: "../src"
+  base: "src"
+}
