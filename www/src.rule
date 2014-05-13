@@ -1,5 +1,5 @@
 {
   program: "compiler"
-  input: "../src"
+  src: "../src"
   base: "src"
 }

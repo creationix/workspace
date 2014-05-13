@@ -1,0 +1,4 @@
+[submodule "lib/gen-run"]
+	url = git@github.com:creationix/gen-run.git
+	ref = refs/heads/master
+	path = lib/gen-run
