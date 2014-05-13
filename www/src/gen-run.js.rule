@@ -1,4 +1,4 @@
 {
   program: "compiler"
-  src: "../../lib/gen-run/run.js"
+  input: "../../lib/gen-run/run.js"
 }

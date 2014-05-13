@@ -2,3 +2,23 @@
 	url = git@github.com:creationix/gen-run.git
 	ref = refs/heads/master
 	path = lib/gen-run
+[submodule "lib/js-git"]
+	url = git@github.com:creationix/js-git.git
+	ref = refs/heads/master
+	path = lib/js-git
+[submodule "lib/bodec"]
+	url = git@github.com:creationix/bodec.git
+	ref = refs/heads/master
+	path = lib/bodec
+[submodule "lib/pathjoin"]
+	url = git@github.com:creationix/pathjoin.git
+	ref = refs/heads/master
+	path = lib/pathjoin
+[submodule "lib/git-sha1"]
+	url = git@github.com:creationix/git-sha1.git
+	ref = refs/heads/master
+	path = lib/git-sha1
+[submodule "lib/pako"]
+	url = git@github.com:nodeca/pako.git
+	ref = refs/heads/master
+	path = lib/pako

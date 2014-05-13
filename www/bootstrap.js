@@ -7,6 +7,7 @@
   var pending = {};
   var scripts = {};
   window.define = define;
+  window.forgeDefiner = forgeDefiner;
   window.require = requireSync;
   window.requireAsync = requireAsync;
   window.defs = defs;
@@ -90,6 +91,28 @@
     for (var i = 0, l = list.length; i < l; i++) {
       load(name, list[i]);
     }
+  }
+
+  var forge = {};
+  function forgeDefiner(name) {
+    var base = name.substring(0, name.lastIndexOf("/"));
+    return function (ids, fn) {
+      console.log("ids", ids);
+      var deps = ids.filter(function (id) {
+        return id[0] === ".";
+      }).map(function (id) {
+        var name = base + id.substring(1);
+        if (!/\.js$/.test(name)) name += ".js";
+        return name;
+      });
+      define(name, deps, function (module, exports) {
+        fn(require, module);
+        console.log("MODULE", module);
+        module.exports(forge);
+        console.log("FORGE", forge);
+        // module.exports(forge);
+      });
+    };
   }
 
 })();
