@@ -19,6 +19,7 @@
 var rsa = window.forge.rsa;
 var pki = window.forge.pki;
 var pem = localStorage.getItem("pem");
+var password, privateKey;
 if (!pem) {
   document.body.innerHTML =
   '<h1>Generating RSA keypair for this environment</h1>' +
@@ -26,16 +27,45 @@ if (!pem) {
 
   // generate an RSA key pair asynchronously (uses web workers if available)
   // use workers: -1 to run a fast core estimator to optimize # of workers
-  rsa.generateKeyPair({bits: 2048, workers: -1}, function(err, keypair) {
-    localStorage.setItem("pem", pki.privateKeyToPem(keypair.privateKey));
-    document.body.textContent = "Done! Reloading...";
-    window.location.reload();
+  rsa.generateKeyPair({bits: 2048, workers: 2}, function(err, keypair) {
+    privateKey = keypair.privateKey;
+    document.body.textContent = "Done!";
+    check();
   });
+  setTimeout(promptPassword, 100);
+
+
   return;
 }
 
-document.body.textContent = "Private key loaded from localStorage!";
-console.log("pem", pem);
+function promptPassword() {
+  var pass1, pass2;
+  do {
+    while (pass1 = window.prompt("Enter passphrase to secure private key"), !pass1);
+    while (pass2 = window.prompt("Enter same passphrase to verify"), pass2 !== pass2);
+  } while (pass1 !== pass2);
+  password = pass1;
+
+  check();
+}
+
+function check() {
+  if (!password || !privateKey) return;
+  var pem = pki.encryptRsaPrivateKey(privateKey, password);
+  console.log(pem);
+  localStorage.setItem("pem", pem);
+  window.reload();
+}
+
+var pem = localStorage.getItem("pem");
+do {
+  var password = window.prompt("Enter passphrase to unlock private key");
+  privateKey = pki.decryptRsaPrivateKey(pem, password);
+} while (!privateKey);
+var publicKey = pki.setRsaPublicKey(privateKey.n, privateKey.e);
+
+document.body.textContent = "Private key loaded and decrypted from localStorage!";
+console.log(pki.publicKeyToPem(publicKey));
 
 
 var repo = {};
