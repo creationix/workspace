@@ -22,3 +22,7 @@
 	url = git@github.com:nodeca/pako.git
 	ref = refs/heads/master
 	path = lib/pako
+[submodule "lib/dombuilder"]
+	url = git@github.com:creationix/dombuilder.git
+	ref = refs/heads/master
+	path = lib/dombuilder

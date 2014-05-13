@@ -1,0 +1,4 @@
+{
+  program: "compiler"
+  input: "../../lib/dombuilder/dombuilder.js"
+}
