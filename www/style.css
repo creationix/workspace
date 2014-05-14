@@ -1,0 +1,65 @@
+body {
+  color: #fff;
+  font-family: ubuntu, sans-serif;
+  margin: 0;
+  background-color: #111;
+  /*background: url(img/background-2.jpg) no-repeat center center fixed;*/
+  /*background-size: cover;*/
+  height: 100%;
+  width: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  position: absolute;
+}
+
+ul.grid {
+  padding: 0;
+}
+ul.grid li {
+  list-style-type: none;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  float: left;
+  margin: 10px;
+  border-radius: 3px;
+  color: #fff;
+  color: rgba(255,255,255,0.9);
+  box-shadow: inset 1px 1px 2px rgba(255,255,255,0.3), inset -1px -1px 2px rgba(0,0,0,0.3);
+}
+ul.grid li i {
+  font-size: 64px;
+  line-height: 80px;
+  position: relative;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.3), -1px -1px 2px rgba(0,0,0,0.3);
+}
+ul.grid li p {
+  font-size: 15px;
+  margin: 0;
+  margin-top: -20px;
+  line-height: 40px;
+  text-shadow: 0 0 2px rgba(255,255,255,0.6);
+}
+ul.grid li:hover {
+  box-shadow: 0 0 10px #fff, inset 0 0 5px rgba(0,0,0,0.4);
+}
+ul.grid li:hover p {
+  text-shadow: 0 0 4px rgba(255,255,255,1.0);
+}
+.blue {
+  background-color: #14f;
+}
+.green {
+  background-color: #0b0;
+}
+.orange {
+  background-color: #e80;
+}
+.red {
+  background-color: #f10;
+}
+.grey {
+  background-color: #334;
+}

@@ -26,3 +26,7 @@
 	url = git@github.com:creationix/dombuilder.git
 	ref = refs/heads/master
 	path = lib/dombuilder
+[submodule "lib/Font-Awesome"]
+	url = git@github.com:FortAwesome/Font-Awesome.git
+	ref = refs/heads/master
+	path = lib/Font-Awesome
