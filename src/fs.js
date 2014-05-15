@@ -1,5 +1,9 @@
 "use strict";
-module.exports = function (repo, encrypt, decrypt) {
+// options.getRootHash() -> rootHash
+// options.setRootHash(rootHash)
+// options.encrypt(plain) -> encrypted
+// options.decrypt(encrypted) -> plain
+module.exports = function (repo, options) {
   return {
     readFile: readFile,
     writeFile: writeFile,

@@ -1,6 +1,8 @@
 "use strict";
-var keys = require('keys');
-var bodec = require('bodec');
+require('fs');
+return;
+// var keys = require('keys');
+// var bodec = require('bodec');
 // var dombuilder = require('dombuilder');
 // var pki = window.forge.pki;
 // var random = window.forge.random;
