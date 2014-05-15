@@ -1,6 +1,7 @@
 "use strict";
 
 var forge = window.forge;
+var bodec = require('bodec');
 var rsa = forge.rsa;
 var pki = forge.pki;
 var pem = localStorage.getItem("encryptedPrivateKey");
@@ -74,8 +75,30 @@ catch (err) {
   throw err;
 }
 
+function encrypt(plain) {
+  var iv = forge.random.getBytesSync(16);
+  var cipher = forge.aes.createEncryptionCipher(key, 'CBC');
+  cipher.start(iv);
+  cipher.update(forge.util.createBuffer(plain));
+  cipher.finish();
+  var encrypted = cipher.output;
+  return bodec.fromRaw(iv + encrypted.bytes());
+}
+
+function decrypt(encrypted) {
+  var iv = bodec.toRaw(encrypted, 0, 16);
+  var cipher = forge.aes.createDecryptionCipher(key, 'CBC');
+  cipher.start(iv);
+  cipher.update(forge.util.createBuffer(bodec.slice(encrypted, 16)));
+  cipher.finish();
+  var decrypted = cipher.output;
+  return bodec.fromRaw(decrypted.bytes());
+}
+
 module.exports = {
   publicKey: publicKey,
   privateKey: privateKey,
-  key: key
+  key: key,
+  encrypt: encrypt,
+  decrypt: decrypt
 };
