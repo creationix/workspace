@@ -2,11 +2,21 @@
 var bodec = require('bodec');
 var keys = require('keys');
 var forge = window.forge;
+var defer = require('js-git/lib/defer');
 
 var storage = {};
-require('js-git/mixins/indexed-db')(storage, "encfs");
+if (true) { // github mode
+  require('js-github/mixins/github-db')(storage, "creationix/test-workspace", getVariable("token"));
+  require('js-git/mixins/add-cache')(storage, require('js-git/mixins/indexed-db'));
+  // We still need to override createTree in the github backend, it can't handle
+  // binary files. (And still may have other bugs on github's side.)
+  require('js-git/mixins/create-tree')(storage);
+}
+else { // localstorage mode
+  require('js-git/mixins/indexed-db')(storage, "encfs");
+  require('js-git/mixins/create-tree')(storage);
+}
 require('js-git/mixins/path-to-entry')(storage);
-require('js-git/mixins/create-tree')(storage);
 require('js-git/mixins/mem-cache')(storage);
 require('js-git/mixins/formats')(storage);
 
@@ -24,9 +34,10 @@ var fs = require('js-git/lib/git-fs')(storage, {
     cipher.update(forge.util.createBuffer(plain));
     cipher.finish();
     var encrypted = cipher.output.bytes();
-    console.log("in", {
+    console.log("encrypt", {
       iv: iv,
-      encrypted: encrypted
+      encrypted: encrypted,
+      plain: bodec.toRaw(plain)
     });
     return bodec.fromRaw(iv + encrypted);
   },
@@ -34,7 +45,7 @@ var fs = require('js-git/lib/git-fs')(storage, {
     var cipher = forge.aes.createDecryptionCipher(keys.key, 'CBC');
     var iv = bodec.toRaw(encrypted, 0, 16);
     encrypted = bodec.toRaw(encrypted, 16);
-    console.log("out", {
+    console.log("decrypt", {
       iv: iv,
       encrypted: encrypted
     });
@@ -55,19 +66,45 @@ var fs = require('js-git/lib/git-fs')(storage, {
   },
   setRootTree: function (hash, callback) {
     rootTree = hash;
-    storage.saveAs("commit", {
-      tree: hash,
-      author: {
-        name: "JS-Git",
-        email: "js-git@creationix.com"
-      },
-      message: "Auto commit to update fs image"
-    }, function (err, hash) {
-      if (!hash) return callback(err);
-      storage.updateRef("refs/heads/master", hash, callback, true);
-    });
+    defer(saveRoot);
+    callback();
   }
 });
+
+var saving, savedRoot;
+function saveRoot() {
+  if (saving || savedRoot === rootTree) return;
+  saving = rootTree;
+  storage.saveAs("commit", {
+    tree: rootTree,
+    author: {
+      name: "JS-Git",
+      email: "js-git@creationix.com"
+    },
+    message: "Auto commit to update fs image"
+  }, function (err, hash) {
+    if (!hash) return onDone(err);
+    storage.updateRef("refs/heads/master", hash, function (err) {
+      onDone(err);
+    }, true);
+
+    function onDone(err) {
+      if (!err) savedRoot = saving;
+      saving = false;
+      if (err) throw err;
+    }
+  });
+
+}
+// Don't wait for writes to finish.
+var writeFile = fs.writeFile;
+fs.writeFile = function fastWriteFile(path, value, callback) {
+  if (!callback) return fastWriteFile.bind(fs, path, value);
+  writeFile.call(fs, path, value, function (err) {
+    if (err) console.error(err.stack);
+  });
+  callback();
+};
 
 // fs.writeFile("path/to/file", bodec.fromUnicode("Hello"), function (err) {
 //   if (err) throw err;
@@ -78,7 +115,7 @@ var fs = require('js-git/lib/git-fs')(storage, {
 //   });
 // });
 
-var repo = { rootPath: "" };
+var repo = { };
 require('js-git/mixins/fs-db')(repo, fs);
 require('js-git/mixins/create-tree')(repo);
 require('js-git/mixins/formats')(repo);
@@ -89,3 +126,15 @@ module.exports = function (callback) {
     callback(null, repo, fs);
   });
 };
+
+function getVariable(variable, message) {
+  var query = window.location.search.substring(1);
+  var vars = query.split('&');
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split('=');
+    if (decodeURIComponent(pair[0]) == variable) {
+      return decodeURIComponent(pair[1]);
+    }
+  }
+  return window.prompt(message || "Please enter " + variable);
+}
