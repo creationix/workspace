@@ -1,5 +1,33 @@
 "use strict";
-require('fs');
+var modes = require('js-git/lib/modes');
+require('repo')(function (err, repo, fs) {
+  if (err) throw err;
+  repo.createTree([
+    {
+      path: "www/index.html",
+      mode: modes.blob,
+      content: "<html><head><title>Test!</title></head><body><h1>Test!</h1></body></html>"
+    }
+  ], function (err, hash) {
+    if (err) throw err;
+    console.log("TREE HASH", hash);
+    repo.saveAs("commit", {
+      tree: hash,
+      author: {
+        name: "Tim Caswell",
+        email: "tim@creationix.com"
+      },
+      message: "Initial commit"
+    }, function (err, hash) {
+      if (err) throw err;
+      repo.updateRef("refs/heads/master", hash, function (err) {
+        if (err) throw err;
+        console.log("DONE");
+      });
+    });
+  });
+});
+
 return;
 // var keys = require('keys');
 // var bodec = require('bodec');
