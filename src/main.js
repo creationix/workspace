@@ -2,6 +2,7 @@
 var modes = require('js-git/lib/modes');
 require('repo')(function (err, repo, fs) {
   if (err) throw err;
+
   repo.createTree([
     {
       path: "www/index.html",
@@ -29,23 +30,6 @@ require('repo')(function (err, repo, fs) {
 });
 
 return;
-// var keys = require('keys');
-// var bodec = require('bodec');
-// var dombuilder = require('dombuilder');
-// var pki = window.forge.pki;
-// var random = window.forge.random;
-// var aes = window.forge.aes;
-// var run = require('gen-run');
-// var makeFs = require('fs');
-
-var message = bodec.fromUnicode("Hello World\n");
-var encrypted = keys.encrypt(message);
-var decrypted = keys.decrypt(encrypted);
-console.log({
-  message: message,
-  encrypted: encrypted,
-  decrypted: decrypted
-});
 
 // run(function* () {
 //   // Initialize the idb mixin module.
